@@ -4,6 +4,10 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UploadModule } from './upload/upload.module';
+import { AllExceptionsFilter } from './commom/filters/all-exceptions.filter';
+import { APP_FILTER } from '@nestjs/core';
+
 @Module({
   imports: [
     AuthModule,
@@ -20,6 +24,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
             database: process.env.DB_DATABASE || './db.sqlite',
             synchronize: process.env.DB_SYNCHRONIZE === '1',
             autoLoadEntities: process.env.DB_AUTO_LOAD_ENTITIES === '1',
+            // entities: [User, Post],
           };
         }
 
@@ -32,13 +37,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           database: process.env.DB_DATABASE,
           synchronize: process.env.DB_SYNCHRONIZE === '1',
           autoLoadEntities: process.env.DB_AUTO_LOAD_ENTITIES === '1',
-          // entities: [User, Post],
         };
       },
     }),
+    UploadModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
   exports: [],
 })
 export class AppModule {}
